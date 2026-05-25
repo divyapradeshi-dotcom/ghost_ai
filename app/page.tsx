@@ -1,9 +1,7 @@
-import {Button} from "@/components/ui/button"
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center">
+    <section className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center">
       <div>ghost AI</div>
-        <Button>Click me</Button>
-    </main>
+    </section>
   );
 }
