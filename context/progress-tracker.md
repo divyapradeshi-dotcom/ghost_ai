@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Editor chrome setup
+- Authentication setup
 
 ## Current Goal
 
-- Implement the reusable editor navbar, project sidebar, and dialog pattern from `context/feature-specs/02-editor.md`.
+- Implement Clerk authentication wiring from `context/feature-specs/03-auth.md`.
 
 ## Completed
 
@@ -18,6 +18,10 @@ Update this file whenever the current phase, active feature, or implementation s
 - Mapped Ghost AI dark theme tokens in `app/globals.css` and enabled dark mode at the root layout.
 - Editor chrome from `context/feature-specs/02-editor.md`.
 - Added reusable editor navbar, floating project sidebar, and dialog content pattern.
+- Installed the local `clerk-nextjs-patterns` skill under `.agents/skills` for Clerk + Next.js auth guidance.
+- Clerk authentication wiring from `context/feature-specs/03-auth.md`.
+- Added Clerk provider theming, sign-in and sign-up pages, protected `proxy.ts`, root auth redirect, and editor user menu.
+- Refined the Clerk auth screen to match the screenshot direction with a 50/50 desktop split, tinted brand panel, compact feature rows, and Geist-based typography.
 
 ## In Progress
 
@@ -41,3 +45,7 @@ Update this file whenever the current phase, active feature, or implementation s
 - Started `02-editor.md` implementation.
 - Completed `02-editor.md` implementation. Verified with lint, TypeScript, and production build.
 - Wired the editor navbar and project sidebar into a reusable editor layout shell with local sidebar toggle state. Verified with lint and TypeScript.
+- Added the `clerk-nextjs-patterns` skill from `clerk/skills`; `skills-lock.json` now records the installed skill source and hash.
+- Started `03-auth.md` implementation for Clerk provider, auth pages, route protection, redirects, and editor user menu.
+- Completed `03-auth.md` implementation. Installed `@clerk/ui`, wired Clerk's dark theme with app CSS variables, added auth routes and protected proxy, moved the editor shell to `/editor`, and verified with lint, TypeScript, and production build.
+- Updated the auth page UI from screenshot feedback. Verified the refinement with lint, TypeScript, and production build.

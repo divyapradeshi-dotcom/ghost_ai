@@ -1,7 +1,10 @@
-export default function Home() {
-  return (
-    <section className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center">
-      <div>ghost AI</div>
-    </section>
-  );
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+
+import { signInUrl } from "@/lib/auth-routes";
+
+export default async function Home() {
+  const { isAuthenticated } = await auth();
+
+  redirect(isAuthenticated ? "/editor" : signInUrl);
 }
