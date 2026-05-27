@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Authentication setup
+- Project dialogs complete
 
 ## Current Goal
 
-- Implement Clerk authentication wiring from `context/feature-specs/03-auth.md`.
+- Move to the next feature spec.
 
 ## Completed
 
@@ -22,6 +22,8 @@ Update this file whenever the current phase, active feature, or implementation s
 - Clerk authentication wiring from `context/feature-specs/03-auth.md`.
 - Added Clerk provider theming, sign-in and sign-up pages, protected `proxy.ts`, root auth redirect, and editor user menu.
 - Refined the Clerk auth screen to match the screenshot direction with a 50/50 desktop split, tinted brand panel, compact feature rows, and Geist-based typography.
+- Project dialogs and sidebar actions from `context/feature-specs/04-project-dialogs.md`.
+- Added the editor home screen, project dialog state hook/provider, create/rename/delete dialogs, mock project sidebar actions, and mobile sidebar scrim.
 
 ## In Progress
 
@@ -41,6 +43,8 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Session Notes
 
+- Started `04-project-dialogs.md` implementation for the editor home, mock project actions, project dialogs, and mobile sidebar scrim.
+- Completed `04-project-dialogs.md` implementation. Verified sidebar actions, create and rename form wiring, live slug preview, mobile scrim close behavior, lint, and TypeScript.
 - Completed `01-design-system.md` implementation. Verified UI component imports with TypeScript, linted successfully, and checked `cn()` class merging.
 - Started `02-editor.md` implementation.
 - Completed `02-editor.md` implementation. Verified with lint, TypeScript, and production build.
