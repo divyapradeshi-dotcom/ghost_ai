@@ -4,7 +4,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Project dialogs complete
+- Prisma foundation complete
 
 ## Current Goal
 
@@ -24,6 +24,10 @@ Update this file whenever the current phase, active feature, or implementation s
 - Refined the Clerk auth screen to match the screenshot direction with a 50/50 desktop split, tinted brand panel, compact feature rows, and Geist-based typography.
 - Project dialogs and sidebar actions from `context/feature-specs/04-project-dialogs.md`.
 - Added the editor home screen, project dialog state hook/provider, create/rename/delete dialogs, mock project sidebar actions, and mobile sidebar scrim.
+- Prisma foundation from `context/feature-specs/05-prisma.md`.
+- Added `Project` and `ProjectCollaborator` Prisma models, project status enum, required indexes, collaborator uniqueness, and cascade delete relation.
+- Added cached Prisma client singleton in `lib/prisma.ts` with Accelerate URL support and direct PostgreSQL adapter fallback.
+- Created and applied migration `20260601082548_init_project_models`, then regenerated the Prisma client.
 
 ## In Progress
 
@@ -45,6 +49,8 @@ Update this file whenever the current phase, active feature, or implementation s
 
 - Started `04-project-dialogs.md` implementation for the editor home, mock project actions, project dialogs, and mobile sidebar scrim.
 - Completed `04-project-dialogs.md` implementation. Verified sidebar actions, create and rename form wiring, live slug preview, mobile scrim close behavior, lint, and TypeScript.
+- Completed `05-prisma.md` implementation. Verified Prisma schema validation, TypeScript, lint, migration application, Prisma client generation, and production build.
+- `npm run build` passes with a Next.js workspace-root warning caused by an additional parent lockfile at `C:\Users\divya\package-lock.json`.
 - Completed `01-design-system.md` implementation. Verified UI component imports with TypeScript, linted successfully, and checked `cn()` class merging.
 - Started `02-editor.md` implementation.
 - Completed `02-editor.md` implementation. Verified with lint, TypeScript, and production build.
