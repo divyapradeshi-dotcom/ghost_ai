@@ -4,17 +4,24 @@ import { type ReactNode, useState } from "react";
 
 import { EditorNavbar } from "@/components/editor/editor-navbar";
 import { ProjectSidebar } from "@/components/editor/project-sidebar";
-import { ProjectDialogsProvider } from "@/components/editor/use-project-dialogs";
+import { ProjectActionsProvider } from "@/hooks/use-project-actions";
+import type { EditorProject } from "@/lib/project-data";
 
 interface EditorLayoutProps {
   children: ReactNode;
+  ownedProjects: EditorProject[];
+  sharedProjects: EditorProject[];
 }
 
-export function EditorLayout({ children }: EditorLayoutProps) {
+export function EditorLayout({
+  children,
+  ownedProjects,
+  sharedProjects,
+}: EditorLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   return (
-    <ProjectDialogsProvider>
+    <ProjectActionsProvider>
       <div className="min-h-screen bg-base text-copy-primary">
         <EditorNavbar
           isSidebarOpen={isSidebarOpen}
@@ -31,9 +38,11 @@ export function EditorLayout({ children }: EditorLayoutProps) {
         <ProjectSidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
+          ownedProjects={ownedProjects}
+          sharedProjects={sharedProjects}
         />
         <main className="min-h-[calc(100vh-3.5rem)]">{children}</main>
       </div>
-    </ProjectDialogsProvider>
+    </ProjectActionsProvider>
   );
 }

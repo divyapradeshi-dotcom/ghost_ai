@@ -4,7 +4,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Prisma foundation complete
+- Project APIs complete
 
 ## Current Goal
 
@@ -28,6 +28,14 @@ Update this file whenever the current phase, active feature, or implementation s
 - Added `Project` and `ProjectCollaborator` Prisma models, project status enum, required indexes, collaborator uniqueness, and cascade delete relation.
 - Added cached Prisma client singleton in `lib/prisma.ts` with Accelerate URL support and direct PostgreSQL adapter fallback.
 - Created and applied migration `20260601082548_init_project_models`, then regenerated the Prisma client.
+- Project API routes from `context/feature-specs/06-project-apis.md`.
+- Added backend-only project list, create, rename, and delete route handlers with Clerk authentication and Prisma owner checks.
+- Added `401` responses for unauthenticated project API requests and `403` responses for non-owner rename/delete attempts.
+- Updated `proxy.ts` so unauthenticated API requests return JSON `401` while protected page routes keep sign-in redirects.
+
+- Wired editor home to server-side project fetching using `getEditorProjects` and passed projects to the editor layout (`app/editor/page.tsx`).
+- Implemented project rename API handler (`PATCH /api/projects/[projectId]`) with owner checks and updated the `use-project-actions` hook to call the correct endpoint.
+- Verified create dialog generates room ID preview and navigates to the new workspace on successful creation.
 
 ## In Progress
 
@@ -51,6 +59,9 @@ Update this file whenever the current phase, active feature, or implementation s
 - Completed `04-project-dialogs.md` implementation. Verified sidebar actions, create and rename form wiring, live slug preview, mobile scrim close behavior, lint, and TypeScript.
 - Completed `05-prisma.md` implementation. Verified Prisma schema validation, TypeScript, lint, migration application, Prisma client generation, and production build.
 - `npm run build` passes with a Next.js workspace-root warning caused by an additional parent lockfile at `C:\Users\divya\package-lock.json`.
+- Completed `06-project-apis.md` implementation. Verified route presence for list/create/rename/delete, owner checks in rename/delete handlers, TypeScript, lint, and production build.
+- `npm run build` still passes with the existing Next.js workspace-root warning caused by `C:\Users\divya\package-lock.json`.
+- Re-verified after proxy API `401` handling with TypeScript, lint, and production build.
 - Completed `01-design-system.md` implementation. Verified UI component imports with TypeScript, linted successfully, and checked `cn()` class merging.
 - Started `02-editor.md` implementation.
 - Completed `02-editor.md` implementation. Verified with lint, TypeScript, and production build.
@@ -59,3 +70,5 @@ Update this file whenever the current phase, active feature, or implementation s
 - Started `03-auth.md` implementation for Clerk provider, auth pages, route protection, redirects, and editor user menu.
 - Completed `03-auth.md` implementation. Installed `@clerk/ui`, wired Clerk's dark theme with app CSS variables, added auth routes and protected proxy, moved the editor shell to `/editor`, and verified with lint, TypeScript, and production build.
 - Updated the auth page UI from screenshot feedback. Verified the refinement with lint, TypeScript, and production build.
+ - Wired editor home to server-side projects and connected the `ProjectSidebar` to real data via `EditorLayout`.
+ - Added `PATCH /api/projects/[projectId]` to support renaming projects and fixed the client rename call in `hooks/use-project-actions.tsx`.

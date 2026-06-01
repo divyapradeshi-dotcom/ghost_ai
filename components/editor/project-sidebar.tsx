@@ -1,48 +1,21 @@
 "use client";
 
 import { Pencil, Plus, Trash2, X } from "lucide-react";
+import Link from "next/link";
 
-import { useProjectDialogs } from "@/components/editor/use-project-dialogs";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useProjectActions } from "@/hooks/use-project-actions";
+import type { EditorProject } from "@/lib/project-data";
 import { cn } from "@/lib/utils";
 
 interface ProjectSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  ownedProjects: EditorProject[];
+  sharedProjects: EditorProject[];
   className?: string;
 }
-
-interface MockProject {
-  id: string;
-  name: string;
-  description: string;
-  ownerType: "owned" | "shared";
-}
-
-const ownedProjects: MockProject[] = [
-  {
-    id: "commerce-platform",
-    name: "Commerce Platform",
-    description: "Core storefront and checkout architecture",
-    ownerType: "owned",
-  },
-  {
-    id: "data-pipeline",
-    name: "Data Pipeline",
-    description: "Warehouse ingestion and transformation flow",
-    ownerType: "owned",
-  },
-];
-
-const sharedProjects: MockProject[] = [
-  {
-    id: "payments-replatform",
-    name: "Payments Replatform",
-    description: "Shared by Maya Chen",
-    ownerType: "shared",
-  },
-];
 
 function EmptyProjectsState() {
   return (
@@ -53,9 +26,17 @@ function EmptyProjectsState() {
 }
 
 interface ProjectListProps {
-  projects: MockProject[];
-  onRenameProject: (project: MockProject) => void;
-  onDeleteProject: (project: MockProject) => void;
+  projects: EditorProject[];
+  onRenameProject: (project: EditorProject) => void;
+  onDeleteProject: (project: EditorProject) => void;
+}
+
+function formatProjectDate(value: string) {
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(value));
 }
 
 function ProjectList({
@@ -77,14 +58,22 @@ function ProjectList({
             key={project.id}
             className="flex min-h-16 items-center gap-3 rounded-xl border border-surface-border bg-base/50 px-3 py-2"
           >
-            <div className="min-w-0 flex-1">
+            <Link
+              href={`/editor/${project.id}`}
+              className="min-w-0 flex-1 rounded-lg outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/50"
+            >
               <p className="truncate text-sm font-medium text-copy-primary">
                 {project.name}
               </p>
-              <p className="truncate text-xs text-copy-muted">
-                {project.description}
+              {project.description ? (
+                <p className="truncate text-xs text-copy-muted">
+                  {project.description}
+                </p>
+              ) : null}
+              <p className="truncate text-xs text-copy-faint">
+                Updated {formatProjectDate(project.updatedAt)}
               </p>
-            </div>
+            </Link>
 
             {isOwned ? (
               <div className="flex shrink-0 items-center gap-1">
@@ -120,10 +109,12 @@ function ProjectList({
 export function ProjectSidebar({
   isOpen,
   onClose,
+  ownedProjects,
+  sharedProjects,
   className,
 }: ProjectSidebarProps) {
   const { openCreateDialog, openRenameDialog, openDeleteDialog } =
-    useProjectDialogs();
+    useProjectActions();
 
   return (
     <aside

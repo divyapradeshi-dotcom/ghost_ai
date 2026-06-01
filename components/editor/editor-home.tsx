@@ -2,11 +2,11 @@
 
 import { Plus } from "lucide-react";
 
-import { useProjectDialogs } from "@/components/editor/use-project-dialogs";
 import { Button } from "@/components/ui/button";
+import { useProjectActions } from "@/hooks/use-project-actions";
 
 export function EditorHome() {
-  const { openCreateDialog } = useProjectDialogs();
+  const { openCreateDialog } = useProjectActions();
 
   return (
     <section className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-6">
