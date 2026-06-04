@@ -11,12 +11,16 @@ interface EditorLayoutProps {
   children: ReactNode;
   ownedProjects: EditorProject[];
   sharedProjects: EditorProject[];
+  projectName?: string;
+  currentProjectId?: string;
 }
 
 export function EditorLayout({
   children,
   ownedProjects,
   sharedProjects,
+  projectName,
+  currentProjectId,
 }: EditorLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -26,6 +30,8 @@ export function EditorLayout({
         <EditorNavbar
           isSidebarOpen={isSidebarOpen}
           onSidebarToggle={() => setIsSidebarOpen((isOpen) => !isOpen)}
+          projectName={projectName}
+          currentProjectId={currentProjectId}
         />
         {isSidebarOpen ? (
           <button
@@ -40,6 +46,7 @@ export function EditorLayout({
           onClose={() => setIsSidebarOpen(false)}
           ownedProjects={ownedProjects}
           sharedProjects={sharedProjects}
+          currentProjectId={currentProjectId}
         />
         <main className="min-h-[calc(100vh-3.5rem)]">{children}</main>
       </div>

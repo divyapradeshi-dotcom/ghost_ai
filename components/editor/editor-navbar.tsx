@@ -5,19 +5,51 @@ import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { ShareDialog } from "@/components/editor/share-dialog";
 
 interface EditorNavbarProps {
   isSidebarOpen: boolean;
   onSidebarToggle: () => void;
+  projectName?: string;
   className?: string;
+  currentProjectId?: string | undefined;
 }
 
 export function EditorNavbar({
   isSidebarOpen,
   onSidebarToggle,
+  projectName,
   className,
+  currentProjectId,
 }: EditorNavbarProps) {
   const SidebarIcon = isSidebarOpen ? PanelLeftClose : PanelLeftOpen;
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [shareProjectId, setShareProjectId] = useState<string | undefined>(undefined);
+
+  function handleShareClick() {
+    // prefer explicitly passed project id
+    if (currentProjectId) {
+      setShareProjectId(currentProjectId);
+      setIsShareOpen(true);
+      return;
+    }
+
+    // fallback: try to derive project id from the URL (client-only)
+    if (typeof window !== "undefined") {
+      const parts = window.location.pathname.split("/").filter(Boolean);
+      // expect path like /editor/:projectId
+      const editorIndex = parts.indexOf("editor");
+      const maybeId = parts[editorIndex >= 0 ? editorIndex + 1 : parts.length - 1];
+      if (maybeId) {
+        setShareProjectId(maybeId);
+        setIsShareOpen(true);
+        return;
+      }
+    }
+
+    // nothing to do if no project id
+  }
 
   return (
     <header
@@ -41,10 +73,37 @@ export function EditorNavbar({
       </div>
 
       <div className="flex flex-1 items-center justify-center">
-        <div aria-hidden="true" />
+        {projectName ? (
+          <div className="truncate text-sm font-medium text-copy-primary">
+            {projectName}
+          </div>
+        ) : (
+          <div aria-hidden="true" />
+        )}
       </div>
 
-      <div className="flex flex-1 items-center justify-end">
+      <div className="flex flex-1 items-center justify-end gap-2">
+        <Button
+          type="button"
+          variant="ghost"
+          className="text-copy-secondary hover:bg-subtle hover:text-copy-primary"
+          onClick={handleShareClick}
+        >
+          Share
+        </Button>
+        {shareProjectId ? (
+          <ShareDialog
+            projectId={shareProjectId}
+            open={isShareOpen}
+            onOpenChange={(open) => {
+              setIsShareOpen(open);
+              if (!open) setShareProjectId(undefined);
+            }}
+          />
+        ) : null}
+        <Button type="button" variant="ghost" className="text-copy-secondary hover:bg-subtle hover:text-copy-primary">
+          AI
+        </Button>
         <UserButton />
       </div>
     </header>

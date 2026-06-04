@@ -45,6 +45,10 @@ Update this file whenever the current phase, active feature, or implementation s
 
 - Move to the next feature spec.
 
+## Recent Work
+
+- Implemented share dialog: collaborators API, owner checks, and frontend dialog.
+
 ## Open Questions
 
 - Add unresolved product or implementation questions here.

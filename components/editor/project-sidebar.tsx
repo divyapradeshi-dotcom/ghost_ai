@@ -14,6 +14,7 @@ interface ProjectSidebarProps {
   onClose: () => void;
   ownedProjects: EditorProject[];
   sharedProjects: EditorProject[];
+  currentProjectId?: string;
   className?: string;
 }
 
@@ -29,6 +30,7 @@ interface ProjectListProps {
   projects: EditorProject[];
   onRenameProject: (project: EditorProject) => void;
   onDeleteProject: (project: EditorProject) => void;
+  currentProjectId?: string;
 }
 
 function formatProjectDate(value: string) {
@@ -43,6 +45,7 @@ function ProjectList({
   projects,
   onRenameProject,
   onDeleteProject,
+  currentProjectId,
 }: ProjectListProps) {
   if (projects.length === 0) {
     return <EmptyProjectsState />;
@@ -53,14 +56,25 @@ function ProjectList({
       {projects.map((project) => {
         const isOwned = project.ownerType === "owned";
 
+        const isActive = currentProjectId === project.id;
+
         return (
           <div
             key={project.id}
-            className="flex min-h-16 items-center gap-3 rounded-xl border border-surface-border bg-base/50 px-3 py-2"
+            className={cn(
+              "flex min-h-16 items-center gap-3 rounded-xl border px-3 py-2",
+              "transition-colors",
+              isActive
+                ? "bg-gradient-to-r from-brand/70 to-brand/60 text-white border-transparent"
+                : "border-surface-border bg-base/50",
+            )}
           >
             <Link
               href={`/editor/${project.id}`}
-              className="min-w-0 flex-1 rounded-lg outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/50"
+              className={cn(
+                "min-w-0 flex-1 rounded-lg outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/50",
+                isActive ? "text-white" : "text-copy-primary"
+              )}
             >
               <p className="truncate text-sm font-medium text-copy-primary">
                 {project.name}
@@ -111,6 +125,7 @@ export function ProjectSidebar({
   onClose,
   ownedProjects,
   sharedProjects,
+  currentProjectId,
   className,
 }: ProjectSidebarProps) {
   const { openCreateDialog, openRenameDialog, openDeleteDialog } =
@@ -139,7 +154,7 @@ export function ProjectSidebar({
         </Button>
       </div>
 
-      <Tabs defaultValue="my-projects" className="min-h-0 flex-1 gap-4 p-4">
+        <Tabs defaultValue="my-projects" className="min-h-0 flex-1 gap-4 p-4">
         <TabsList className="grid w-full grid-cols-2 bg-subtle text-copy-muted">
           <TabsTrigger value="my-projects">My Projects</TabsTrigger>
           <TabsTrigger value="shared">Shared</TabsTrigger>
@@ -150,6 +165,7 @@ export function ProjectSidebar({
             projects={ownedProjects}
             onRenameProject={openRenameDialog}
             onDeleteProject={openDeleteDialog}
+            currentProjectId={currentProjectId}
           />
         </TabsContent>
         <TabsContent value="shared" className="min-h-0 flex-1">
@@ -157,6 +173,7 @@ export function ProjectSidebar({
             projects={sharedProjects}
             onRenameProject={openRenameDialog}
             onDeleteProject={openDeleteDialog}
+            currentProjectId={currentProjectId}
           />
         </TabsContent>
       </Tabs>
