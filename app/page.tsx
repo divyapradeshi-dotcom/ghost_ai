@@ -1,9 +1,10 @@
-import {Button} from "@/components/ui/button"
-export default function Home() {
-  return (
-    <main className="flex min-h-screen items-center justify-center">
-      <div>ghost AI</div>
-        <Button>Click me</Button>
-    </main>
-  );
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+
+import { signInUrl } from "@/lib/auth-routes";
+
+export default async function Home() {
+  const { isAuthenticated } = await auth();
+
+  redirect(isAuthenticated ? "/editor" : signInUrl);
 }
