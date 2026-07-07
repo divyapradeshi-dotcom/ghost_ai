@@ -45,7 +45,8 @@ export async function GET(
 
   // Only owners or collaborators may view the list
   try {
-    const requester = await clerkClient.users.getUser(userId);
+    const _clerk = await clerkClient();
+    const requester = await _clerk.users.getUser(userId);
     const emails = (requester?.emailAddresses || []).map((e: any) => e.emailAddress).filter(Boolean);
     const isCollaborator = collaborators.some((c) => emails.includes(c.email));
     if (project.ownerId !== userId && !isCollaborator) {
@@ -62,14 +63,17 @@ export async function GET(
   // Also fetch owner user info for display
   let ownerInfo = null;
   try {
-    ownerInfo = await clerkClient.users.getUser(project.ownerId);
+    const _clerk = await clerkClient();
+    ownerInfo = await _clerk.users.getUser(project.ownerId);
   } catch {}
 
   const enriched = await Promise.all(
     collaborators.map(async (c) => {
       try {
-        const users = await clerkClient.users.getUserList({ email: [c.email] });
-        const user = users && users.length > 0 ? users[0] : null;
+        const _clerk = await clerkClient();
+        const users = await _clerk.users.getUserList({ email: [c.email] } as any);
+        const userList = (users as any)?.data || [];
+        const user = userList.length > 0 ? userList[0] : null;
 
         return {
           id: c.id,
@@ -138,8 +142,9 @@ export async function POST(
 
   // Prevent inviting the owner email if we can resolve it via Clerk
   try {
-    const ownerUser = await clerkClient.users.getUser(project.ownerId);
-    const ownerEmail = (ownerUser.emailAddresses || [])[0]?.emailAddress?.toLowerCase();
+  const _clerk = await clerkClient();
+  const ownerUser = await _clerk.users.getUser(project.ownerId);
+  const ownerEmail = (ownerUser.emailAddresses || [])[0]?.emailAddress?.toLowerCase();
     if (ownerEmail && ownerEmail === email) {
       return Response.json({ error: "Cannot invite the project owner" }, { status: 400 });
     }
@@ -156,8 +161,10 @@ export async function POST(
 
     // Try to enrich with Clerk but don't fail on error
     try {
-      const users = await clerkClient.users.getUserList({ email: [email] });
-      const user = users && users.length > 0 ? users[0] : null;
+      const _clerk = await clerkClient();
+      const users = await _clerk.users.getUserList({ email: [email] } as any);
+      const userList = (users as any)?.data || [];
+      const user = userList.length > 0 ? userList[0] : null;
 
       return Response.json({
         collaborator: {

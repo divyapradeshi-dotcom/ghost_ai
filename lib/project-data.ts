@@ -49,46 +49,68 @@ export async function getEditorProjects(): Promise<EditorProjects> {
   const user = await currentUser();
   const collaboratorEmail = user?.primaryEmailAddress?.emailAddress;
 
-  const [ownedProjects, sharedProjects] = await Promise.all([
-    prisma.project.findMany({
-      where: { ownerId: userId },
-      orderBy: { updatedAt: "desc" },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    }),
-    collaboratorEmail
-      ? prisma.project.findMany({
-          where: {
-            ownerId: { not: userId },
-            collaborators: {
-              some: {
-                email: collaboratorEmail,
-              },
+  const ownedProjectsPromise = prisma.project.findMany({
+    where: { ownerId: userId },
+    orderBy: { updatedAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  const sharedProjectsPromise = collaboratorEmail
+    ? prisma.project.findMany({
+        where: {
+          ownerId: { not: userId },
+          collaborators: {
+            some: {
+              email: collaboratorEmail,
             },
           },
-          orderBy: { updatedAt: "desc" },
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            createdAt: true,
-            updatedAt: true,
-          },
-        })
-      : Promise.resolve([]),
+        },
+        orderBy: { updatedAt: "desc" },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      })
+    : Promise.resolve([]);
+
+  const [ownedResult, sharedResult] = await Promise.allSettled([
+    ownedProjectsPromise,
+    sharedProjectsPromise,
   ]);
 
+  if (
+    ownedResult.status === "rejected" ||
+    sharedResult.status === "rejected"
+  ) {
+    console.error("[project-data] Failed to load editor projects", {
+      ownedError:
+        ownedResult.status === "rejected" ? ownedResult.reason : null,
+      sharedError:
+        sharedResult.status === "rejected" ? sharedResult.reason : null,
+    });
+  }
+
   return {
-    ownedProjects: ownedProjects.map((project) =>
-      serializeProject(project, "owned"),
-    ),
-    sharedProjects: sharedProjects.map((project) =>
-      serializeProject(project, "shared"),
-    ),
+    ownedProjects:
+      ownedResult.status === "fulfilled"
+        ? ownedResult.value.map((project) =>
+            serializeProject(project, "owned"),
+          )
+        : [],
+    sharedProjects:
+      sharedResult.status === "fulfilled"
+        ? sharedResult.value.map((project) =>
+            serializeProject(project, "shared"),
+          )
+        : [],
   };
 }

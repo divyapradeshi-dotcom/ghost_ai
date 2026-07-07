@@ -5,6 +5,7 @@ import { type ReactNode, useState } from "react";
 import { EditorNavbar } from "@/components/editor/editor-navbar";
 import { ProjectSidebar } from "@/components/editor/project-sidebar";
 import { ProjectActionsProvider } from "@/hooks/use-project-actions";
+import { AIPanelProvider } from "@/contexts/ai-panel-context";
 import type { EditorProject } from "@/lib/project-data";
 
 interface EditorLayoutProps {
@@ -25,14 +26,15 @@ export function EditorLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   return (
-    <ProjectActionsProvider>
-      <div className="min-h-screen bg-base text-copy-primary">
-        <EditorNavbar
-          isSidebarOpen={isSidebarOpen}
-          onSidebarToggle={() => setIsSidebarOpen((isOpen) => !isOpen)}
-          projectName={projectName}
-          currentProjectId={currentProjectId}
-        />
+    <AIPanelProvider>
+      <ProjectActionsProvider>
+        <div className="min-h-screen bg-base text-copy-primary">
+          <EditorNavbar
+            isSidebarOpen={isSidebarOpen}
+            onSidebarToggle={() => setIsSidebarOpen((isOpen) => !isOpen)}
+            projectName={projectName}
+            currentProjectId={currentProjectId}
+          />
         {isSidebarOpen ? (
           <button
             type="button"
@@ -50,6 +52,7 @@ export function EditorLayout({
         />
         <main className="min-h-[calc(100vh-3.5rem)]">{children}</main>
       </div>
-    </ProjectActionsProvider>
+      </ProjectActionsProvider>
+    </AIPanelProvider>
   );
 }

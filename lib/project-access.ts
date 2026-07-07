@@ -11,6 +11,16 @@ export interface Identity {
   email: string | null;
 }
 
+interface AccessibleProject {
+  id: string;
+  name: string;
+  description: string | null;
+  ownerId: string;
+  collaborators: { email: string }[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export async function getCurrentIdentity(): Promise<Identity> {
   const { isAuthenticated, userId } = await auth();
 
@@ -36,18 +46,28 @@ export async function getProjectIfUserHasAccess(projectId?: string) {
     return null;
   }
 
-  const project = await prisma.project.findUnique({
-    where: { id: projectId },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      ownerId: true,
-      collaborators: { select: { email: true } },
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
+  let project: AccessibleProject | null = null;
+
+  try {
+    project = await prisma.project.findUnique({
+      where: { id: projectId },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        ownerId: true,
+        collaborators: { select: { email: true } },
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  } catch (error) {
+    console.error("[project-access] Failed to load project", {
+      projectId,
+      error,
+    });
+    return null;
+  }
 
   if (!project) return null;
 

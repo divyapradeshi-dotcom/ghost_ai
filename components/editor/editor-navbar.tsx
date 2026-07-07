@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { ShareDialog } from "@/components/editor/share-dialog";
+import { useAIPanel } from "@/contexts/ai-panel-context";
 
 interface EditorNavbarProps {
   isSidebarOpen: boolean;
@@ -24,6 +25,7 @@ export function EditorNavbar({
   currentProjectId,
 }: EditorNavbarProps) {
   const SidebarIcon = isSidebarOpen ? PanelLeftClose : PanelLeftOpen;
+  const { isAIPanelOpen, toggleAIPanel } = useAIPanel();
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [shareProjectId, setShareProjectId] = useState<string | undefined>(undefined);
 
@@ -38,7 +40,7 @@ export function EditorNavbar({
     // fallback: try to derive project id from the URL (client-only)
     if (typeof window !== "undefined") {
       const parts = window.location.pathname.split("/").filter(Boolean);
-      // expect path like /editor/:projectId
+      // expect path like /editor/:roomId
       const editorIndex = parts.indexOf("editor");
       const maybeId = parts[editorIndex >= 0 ? editorIndex + 1 : parts.length - 1];
       if (maybeId) {
@@ -97,11 +99,16 @@ export function EditorNavbar({
             open={isShareOpen}
             onOpenChange={(open) => {
               setIsShareOpen(open);
-              if (!open) setShareProjectId(undefined);
             }}
           />
         ) : null}
-        <Button type="button" variant="ghost" className="text-copy-secondary hover:bg-subtle hover:text-copy-primary">
+        <Button 
+          type="button" 
+          variant="ghost" 
+          className="text-copy-secondary hover:bg-subtle hover:text-copy-primary"
+          onClick={toggleAIPanel}
+          aria-pressed={isAIPanelOpen}
+        >
           AI
         </Button>
         <UserButton />

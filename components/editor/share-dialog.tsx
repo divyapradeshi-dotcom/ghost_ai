@@ -25,6 +25,7 @@ export function ShareDialog({ projectId, open, onOpenChange }: ShareDialogProps)
   const [owner, setOwner] = useState<any | null>(null);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<string | null>(null);
+  const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const [projectUrl, setProjectUrl] = useState("");
 
   useEffect(() => {
@@ -119,11 +120,11 @@ export function ShareDialog({ projectId, open, onOpenChange }: ShareDialogProps)
         throw new Error("clipboard-unavailable");
       }
       await navigator.clipboard.writeText(url);
-      setStatus("Copied!");
-      setTimeout(() => setStatus(null), 1500);
+      setCopyStatus("Copied to clipboard!");
+      setTimeout(() => setCopyStatus(null), 2000);
     } catch {
-      setStatus("Copy failed");
-      setTimeout(() => setStatus(null), 1500);
+      setCopyStatus("Failed to copy");
+      setTimeout(() => setCopyStatus(null), 2000);
     }
   }
 
@@ -135,40 +136,58 @@ export function ShareDialog({ projectId, open, onOpenChange }: ShareDialogProps)
           <DialogDescription>Invite collaborators or copy the project link.</DialogDescription>
         </DialogHeader>
 
-        <div className="mt-2 space-y-3">
-          <div>
-            <p className="text-xs text-copy-muted">Project link</p>
-            <div className="mt-2 flex items-center gap-2">
-              <Input readOnly value={projectUrl} className="text-white" />
-              <Button type="button" onClick={copyLink}>
-                Copy
+        <div className="mt-2 space-y-4">
+          {/* Workspace Link Section */}
+          <div className="rounded-lg border border-border-default bg-bg-subtle p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-text-primary">Workspace Link</p>
+                <p className="text-xs text-text-secondary">Share this link with collaborators</p>
+              </div>
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+              <Input
+                readOnly
+                value={projectUrl}
+                className="text-sm text-text-primary"
+              />
+              <Button
+                type="button"
+                onClick={copyLink}
+                variant={copyStatus ? "default" : "outline"}
+                className="shrink-0"
+              >
+                {copyStatus ? "✓ Copied" : "Copy"}
               </Button>
             </div>
+            {copyStatus && (
+              <p className="mt-2 text-xs text-state-success">{copyStatus}</p>
+            )}
           </div>
 
           {owner ? (
-            <div>
-              <p className="text-xs text-copy-muted">Owner</p>
-              <div className="mt-2 flex items-center gap-2">
+            <div className="rounded-lg border border-border-default bg-bg-subtle p-4">
+              <p className="mb-3 text-sm font-semibold text-text-primary">Owner</p>
+              <div className="flex items-center gap-2">
                 {owner.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={owner.avatarUrl} alt="owner avatar" className="h-6 w-6 rounded-full" />
                 ) : (
-                  <div className="h-6 w-6 rounded-full bg-surface-border grid place-items-center text-xs">{((owner.displayName || owner.email || owner.id) || "?").charAt(0)?.toUpperCase()}</div>
+                  <div className="h-6 w-6 rounded-full bg-surface-border grid place-items-center text-xs text-text-primary">{((owner.displayName || owner.email || owner.id) || "?").charAt(0)?.toUpperCase()}</div>
                 )}
                 <div className="text-sm">
-                  <div className="font-medium">{owner.displayName || owner.email || owner.id}</div>
-                  <div className="text-xs text-copy-muted">{owner.email || owner.id}</div>
+                  <div className="font-medium text-text-primary">{owner.displayName || owner.email || owner.id}</div>
+                  <div className="text-xs text-text-secondary">{owner.email || owner.id}</div>
                 </div>
               </div>
             </div>
           ) : null}
 
-          <div>
-            <p className="text-xs text-copy-muted">Collaborators</p>
-            <div className="mt-2 space-y-2">
+          <div className="rounded-lg border border-border-default bg-bg-subtle p-4">
+            <p className="mb-3 text-sm font-semibold text-text-primary">Collaborators</p>
+            <div className="space-y-2">
               {collaborators.length === 0 ? (
-                <div className="text-sm text-copy-muted">No collaborators</div>
+                <div className="text-sm text-text-secondary">No collaborators yet</div>
               ) : (
                 collaborators.map((c: any) => (
                   <div key={c.id || c.email} className="flex items-center justify-between gap-2">
@@ -177,16 +196,16 @@ export function ShareDialog({ projectId, open, onOpenChange }: ShareDialogProps)
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={c.avatarUrl} alt="avatar" className="h-6 w-6 rounded-full" />
                       ) : (
-                        <div className="h-6 w-6 rounded-full bg-surface-border grid place-items-center text-xs">{(c.email || "?").charAt(0)?.toUpperCase()}</div>
+                        <div className="h-6 w-6 rounded-full bg-surface-border grid place-items-center text-xs text-text-primary">{(c.email || "?").charAt(0)?.toUpperCase()}</div>
                       )}
                       <div className="text-sm">
-                        <div className="font-medium">{c.displayName || c.email}</div>
-                        <div className="text-xs text-copy-muted">{c.email}</div>
+                        <div className="font-medium text-text-primary">{c.displayName || c.email}</div>
+                        <div className="text-xs text-text-secondary">{c.email}</div>
                       </div>
                     </div>
                     <div>
                       {isOwner ? (
-                        <Button variant="ghost" onClick={() => remove(c.email)}>
+                        <Button variant="ghost" size="sm" onClick={() => remove(c.email)}>
                           Remove
                         </Button>
                       ) : null}
@@ -198,13 +217,24 @@ export function ShareDialog({ projectId, open, onOpenChange }: ShareDialogProps)
           </div>
 
           {isOwner ? (
-            <form onSubmit={invite} className="mt-2 flex gap-2">
-              <Input placeholder="Invite by email" value={email} onChange={(e) => setEmail(e.target.value)} className="text-white" />
-              <Button type="submit">Invite</Button>
+            <form onSubmit={invite} className="rounded-lg border border-border-default bg-bg-subtle p-4">
+              <p className="mb-3 text-sm font-semibold text-text-primary">Invite by email</p>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Enter email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="text-text-primary"
+                />
+                <Button type="submit">Invite</Button>
+              </div>
+              {status && (
+                <p className={`mt-2 text-xs ${status.includes("Cannot") || status.includes("Failed") ? "text-state-error" : "text-state-success"}`}>
+                  {status}
+                </p>
+              )}
             </form>
           ) : null}
-
-          {status ? <div className="text-sm text-copy-muted">{status}</div> : null}
         </div>
 
         <DialogFooter>
